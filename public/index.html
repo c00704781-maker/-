@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Shadow Rift - Gacha RPG</title>
+  <title>Shadow Rift - Pixel Gacha RPG</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="stars"></div>
+  <div class="bg-stars"></div>
   <main class="phone">
-    <section class="hero-screen active" id="home">
-      <div class="topbar">
-        <div><span>💎</span><b id="gems">0</b></div>
-        <div><span>🪙</span><b id="gold">0</b></div>
-        <div><span>⚡</span><b id="stamina">0</b></div>
+    <section class="screen active" id="home">
+      <div class="hud">
+        <div><small>GEMS</small><b id="gems">0</b></div>
+        <div><small>GOLD</small><b id="gold">0</b></div>
+        <div><small>ENERGY</small><b id="stamina">0</b></div>
       </div>
 
-      <div class="logo-wrap">
+      <div class="title-card">
         <img src="assets/portal.svg" class="portal" alt="portal" />
         <h1>SHADOW<br><span>RIFT</span></h1>
-        <p>GACHA RPG</p>
+        <p>PIXEL GACHA RPG</p>
       </div>
 
       <div class="power-card">
@@ -28,81 +28,72 @@
         <small id="worldName">Shadow Forest</small>
       </div>
 
-      <div class="team-row" id="teamRow"></div>
+      <div class="party-preview" id="teamRow"></div>
 
-      <div class="panel compact">
+      <div class="glass-box">
         <h2 id="playerTitle">Commander</h2>
-        <p id="storyText">افتح الخريطة، اختر Stage، ثم ادخل معركة RPG فيها فريقك يسار والزعيم يمين.</p>
-        <button class="primary" onclick="showPage('mapPage')">🗺️ Open RPG Map</button>
+        <p>خريطة مراحل، قتال RPG جانبي، شخصيات Pixel تتحرك، بوسات، ومهارات تطير على العدو.</p>
+        <button class="primary" onclick="showPage('mapPage')">🗺️ Start Adventure</button>
         <button onclick="claimDaily()">🎁 Daily Reward</button>
       </div>
     </section>
 
-    <section class="page" id="mapPage">
-      <div class="map-header">
-        <div>
-          <h2>World Map</h2>
-          <p>اضغط على أي مرحلة مفتوحة للدخول مباشرة إلى ساحة القتال.</p>
-        </div>
+    <section class="screen" id="mapPage">
+      <div class="section-head">
+        <div><h2>Adventure Map</h2><p>اضغط المرحلة، تنتقل لساحة القتال مباشرة.</p></div>
         <b id="mapPower">0 PWR</b>
       </div>
-      <div class="world-road" id="mapPanel"></div>
-      <p class="hint">كل 5 مراحل Boss. كل عالم له خلفية ووحوش مختلفة.</p>
+      <div id="worldBanner" class="world-banner"></div>
+      <div class="stage-map" id="mapPanel"></div>
     </section>
 
-    <section class="page" id="gachaPage">
-      <h2>Summon Gate</h2>
-      <div class="summon-altar">
+    <section class="screen" id="gachaPage">
+      <div class="section-head"><div><h2>Summon Gate</h2><p>اسحب أبطال Pixel أقوى وافتح الفريق المثالي.</p></div></div>
+      <div class="summon-scene">
         <img src="assets/crystal.svg" alt="crystal" />
+        <div class="summon-ring"></div>
       </div>
-      <p class="rates">Rates: R 63% • SR 27% • SSR 8% • UR 2%</p>
-      <button class="primary" onclick="pull(1)">سحبة واحدة - 150 💎</button>
-      <button onclick="pull(10)">10 سحبات - 1350 💎</button>
+      <p class="rates">R 63% • SR 27% • SSR 8% • UR 2%</p>
+      <button class="primary" onclick="pull(1)">Single Pull - 150 💎</button>
+      <button onclick="pull(10)">10 Pulls - 1350 💎</button>
       <div id="pullResults" class="results"></div>
     </section>
 
-    <section class="page" id="heroesPage">
-      <h2>Heroes & Skills</h2>
+    <section class="screen" id="heroesPage">
+      <div class="section-head"><div><h2>Heroes</h2><p>طور الشخصيات واختَر فريقك. كل بطل له مهارة مختلفة.</p></div></div>
       <div id="heroGrid" class="hero-grid"></div>
     </section>
 
-    <section class="page battle-page" id="battlePage">
+    <section class="screen battle-screen" id="battlePage">
       <div class="battle-top">
-        <button class="back-btn" onclick="showPage('mapPage')">← Map</button>
-        <div>
-          <h2 id="battleTitle">Stage</h2>
-          <p id="battleSubtitle">RPG Battle</p>
-        </div>
+        <button class="mini" onclick="showPage('mapPage')">← Map</button>
+        <div><h2 id="battleTitle">Stage</h2><p id="battleSubtitle">Pixel RPG Battle</p></div>
         <b id="turnText">Turn 1</b>
       </div>
 
-      <div class="rpg-arena" id="battlefield">
-        <div class="battle-power player-power">
-          <small>YOUR POWER</small>
-          <b id="powerText">0</b>
-        </div>
-        <div class="battle-power enemy-power">
-          <small>ENEMY POWER</small>
-          <b id="enemyText">0</b>
-        </div>
+      <div class="battle-arena forest" id="battlefield">
+        <div class="parallax layer-a"></div>
+        <div class="parallax layer-b"></div>
+        <div class="ground"></div>
 
-        <div class="party-side" id="battleTeam"></div>
+        <div class="battle-stat left"><small>TEAM PWR</small><b id="powerText">0</b></div>
+        <div class="battle-stat right"><small>ENEMY PWR</small><b id="enemyText">0</b></div>
 
-        <div class="enemy-side">
+        <div class="hp player-hp"><span>Your HP</span><div><i id="playerHpBar"></i></div></div>
+        <div class="hp enemy-hp"><span>Enemy HP</span><div><i id="enemyHpBar"></i></div></div>
+
+        <div class="party-field" id="battleTeam"></div>
+        <div class="enemy-field" id="enemyBox">
           <span id="bossTag"></span>
-          <img id="enemyImg" src="assets/monster-slime.svg" alt="enemy" />
+          <img id="enemyImg" src="assets/boss-shadow.svg" alt="enemy" />
           <h3 id="enemyName">Enemy</h3>
         </div>
-
-        <div class="hp player-hp"><span>Your HP</span><div class="bar"><i id="playerHpBar"></i></div></div>
-        <div class="hp enemy-hp"><span>Enemy HP</span><div class="bar"><i id="enemyHpBar"></i></div></div>
       </div>
 
-      <div id="battleLog" class="battle-log">اختر مرحلة من الخريطة لبدء القتال.</div>
-
-      <div class="skill-dock">
-        <div id="skillsPanel" class="skill-grid"></div>
-        <button class="auto-btn" onclick="useAutoSkills()">AUTO</button>
+      <div id="battleLog" class="battle-log">اختر Stage من الخريطة.</div>
+      <div class="skill-area">
+        <div class="skill-grid" id="skillsPanel"></div>
+        <button class="auto" onclick="useAutoSkills()">AUTO</button>
       </div>
     </section>
 
@@ -111,7 +102,7 @@
       <button onclick="showPage('mapPage')">🗺️ Map</button>
       <button onclick="showPage('gachaPage')">✨ Gacha</button>
       <button onclick="showPage('heroesPage')">🛡️ Heroes</button>
-      <button onclick="showPage('battlePage')">⚔️ Battle</button>
+      <button onclick="showPage('battlePage')">⚔️ Fight</button>
     </nav>
   </main>
 
