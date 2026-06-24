@@ -9,7 +9,7 @@
 <body>
   <div class="stars"></div>
   <main class="phone">
-    <section class="hero-screen" id="home">
+    <section class="hero-screen active" id="home">
       <div class="topbar">
         <div><span>💎</span><b id="gems">0</b></div>
         <div><span>🪙</span><b id="gold">0</b></div>
@@ -32,17 +32,22 @@
 
       <div class="panel compact">
         <h2 id="playerTitle">Commander</h2>
-        <p id="storyText">اجمع أبطالك، طور قوتك، وافتح الخريطة حتى توصل للبوس.</p>
-        <button class="primary" onclick="showPage('mapPage')">🗺️ Open Map</button>
+        <p id="storyText">افتح الخريطة، اختر Stage، ثم ادخل معركة RPG فيها فريقك يسار والزعيم يمين.</p>
+        <button class="primary" onclick="showPage('mapPage')">🗺️ Open RPG Map</button>
         <button onclick="claimDaily()">🎁 Daily Reward</button>
       </div>
     </section>
 
     <section class="page" id="mapPage">
-      <h2>World Map</h2>
-      <div class="map-panel" id="mapPanel"></div>
-      <button class="primary" onclick="startCurrentStage()">ابدأ المرحلة الحالية</button>
-      <p class="hint">كل 5 مراحل يظهر Boss. الوحوش والخلفية تتغير حسب العالم.</p>
+      <div class="map-header">
+        <div>
+          <h2>World Map</h2>
+          <p>اضغط على أي مرحلة مفتوحة للدخول مباشرة إلى ساحة القتال.</p>
+        </div>
+        <b id="mapPower">0 PWR</b>
+      </div>
+      <div class="world-road" id="mapPanel"></div>
+      <p class="hint">كل 5 مراحل Boss. كل عالم له خلفية ووحوش مختلفة.</p>
     </section>
 
     <section class="page" id="gachaPage">
@@ -61,31 +66,44 @@
       <div id="heroGrid" class="hero-grid"></div>
     </section>
 
-    <section class="page" id="battlePage">
-      <h2 id="battleTitle">Campaign</h2>
-      <div class="battlefield" id="battlefield">
-        <div class="side">
-          <p>Your Team</p>
-          <div class="mini-team" id="battleTeam"></div>
+    <section class="page battle-page" id="battlePage">
+      <div class="battle-top">
+        <button class="back-btn" onclick="showPage('mapPage')">← Map</button>
+        <div>
+          <h2 id="battleTitle">Stage</h2>
+          <p id="battleSubtitle">RPG Battle</p>
+        </div>
+        <b id="turnText">Turn 1</b>
+      </div>
+
+      <div class="rpg-arena" id="battlefield">
+        <div class="battle-power player-power">
+          <small>YOUR POWER</small>
           <b id="powerText">0</b>
         </div>
-        <div class="enemy-box" id="enemyBox">
-          <img id="enemyImg" src="assets/monster-slime.svg" alt="enemy" />
-          <span id="bossTag"></span>
-        </div>
-        <div class="side">
-          <p>Enemy</p>
-          <h3 id="enemyName">Slime</h3>
+        <div class="battle-power enemy-power">
+          <small>ENEMY POWER</small>
           <b id="enemyText">0</b>
         </div>
+
+        <div class="party-side" id="battleTeam"></div>
+
+        <div class="enemy-side">
+          <span id="bossTag"></span>
+          <img id="enemyImg" src="assets/monster-slime.svg" alt="enemy" />
+          <h3 id="enemyName">Enemy</h3>
+        </div>
+
+        <div class="hp player-hp"><span>Your HP</span><div class="bar"><i id="playerHpBar"></i></div></div>
+        <div class="hp enemy-hp"><span>Enemy HP</span><div class="bar"><i id="enemyHpBar"></i></div></div>
       </div>
-      <div class="hp-row">
-        <div><span>Your HP</span><div class="bar"><i id="playerHpBar"></i></div></div>
-        <div><span>Enemy HP</span><div class="bar"><i id="enemyHpBar"></i></div></div>
+
+      <div id="battleLog" class="battle-log">اختر مرحلة من الخريطة لبدء القتال.</div>
+
+      <div class="skill-dock">
+        <div id="skillsPanel" class="skill-grid"></div>
+        <button class="auto-btn" onclick="useAutoSkills()">AUTO</button>
       </div>
-      <div id="skillsPanel" class="skills-panel"></div>
-      <button class="primary" onclick="useAutoSkills()">⚔️ Auto Use Skills</button>
-      <div id="battleLog" class="battle-log">افتح الخريطة واختر المرحلة للقتال.</div>
     </section>
 
     <nav>
