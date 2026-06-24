@@ -1,38 +1,56 @@
 const HEROES = [
-  {id:'nyx',name:'Nyx',role:'Shadow Assassin',rarity:'UR',element:'Dark',base:540,img:'assets/hero-nyx.svg'},
-  {id:'aurel',name:'Aurel',role:'Star Paladin',rarity:'UR',element:'Light',base:520,img:'assets/hero-aurel.svg'},
-  {id:'kaida',name:'Kaida',role:'Dragon Mage',rarity:'SSR',element:'Fire',base:420,img:'assets/hero-kaida.svg'},
-  {id:'mira',name:'Mira',role:'Moon Archer',rarity:'SSR',element:'Wind',base:400,img:'assets/hero-mira.svg'},
-  {id:'thane',name:'Thane',role:'Iron Guard',rarity:'SR',element:'Earth',base:295,img:'assets/hero-thane.svg'},
-  {id:'sera',name:'Sera',role:'Crystal Healer',rarity:'SR',element:'Water',base:280,img:'assets/hero-sera.svg'},
-  {id:'riven',name:'Riven',role:'Blade Rogue',rarity:'SR',element:'Dark',base:300,img:'assets/hero-riven.svg'},
-  {id:'luna',name:'Luna',role:'Apprentice Mage',rarity:'R',element:'Water',base:185,img:'assets/hero-luna.svg'},
-  {id:'grom',name:'Grom',role:'Stone Warrior',rarity:'R',element:'Earth',base:195,img:'assets/hero-grom.svg'},
-  {id:'faye',name:'Faye',role:'Forest Scout',rarity:'R',element:'Wind',base:175,img:'assets/hero-faye.svg'}
+  {id:'nyx',name:'Nyx',role:'Shadow Assassin',rarity:'UR',element:'Dark',base:540,img:'assets/hero-nyx.svg',skill:'Void Execute',skillDesc:'ضربة ظل قوية على البوس',mult:1.95},
+  {id:'aurel',name:'Aurel',role:'Star Paladin',rarity:'UR',element:'Light',base:520,img:'assets/hero-aurel.svg',skill:'Solar Guard',skillDesc:'ضرر + درع للفريق',mult:1.75},
+  {id:'kaida',name:'Kaida',role:'Dragon Mage',rarity:'SSR',element:'Fire',base:420,img:'assets/hero-kaida.svg',skill:'Dragon Flame',skillDesc:'حرق عدو واحد بضرر عالي',mult:1.65},
+  {id:'mira',name:'Mira',role:'Moon Archer',rarity:'SSR',element:'Wind',base:400,img:'assets/hero-mira.svg',skill:'Lunar Arrow',skillDesc:'سهم سريع يتجاهل جزء من دفاع العدو',mult:1.55},
+  {id:'thane',name:'Thane',role:'Iron Guard',rarity:'SR',element:'Earth',base:295,img:'assets/hero-thane.svg',skill:'Iron Wall',skillDesc:'يحمي الفريق ثم يضرب',mult:1.25},
+  {id:'sera',name:'Sera',role:'Crystal Healer',rarity:'SR',element:'Water',base:280,img:'assets/hero-sera.svg',skill:'Crystal Heal',skillDesc:'يعالج الفريق ويسبب ضرر بسيط',mult:1.05,heal:true},
+  {id:'riven',name:'Riven',role:'Blade Rogue',rarity:'SR',element:'Dark',base:300,img:'assets/hero-riven.svg',skill:'Backstab',skillDesc:'طعنة حرجة',mult:1.45},
+  {id:'luna',name:'Luna',role:'Apprentice Mage',rarity:'R',element:'Water',base:185,img:'assets/hero-luna.svg',skill:'Moon Spark',skillDesc:'سحر قمر بسيط',mult:1.15},
+  {id:'grom',name:'Grom',role:'Stone Warrior',rarity:'R',element:'Earth',base:195,img:'assets/hero-grom.svg',skill:'Rock Smash',skillDesc:'ضربة حجرية',mult:1.18},
+  {id:'faye',name:'Faye',role:'Forest Scout',rarity:'R',element:'Wind',base:175,img:'assets/hero-faye.svg',skill:'Leaf Shot',skillDesc:'طلقة سريعة',mult:1.12}
 ];
 
-const SAVE_KEY = 'shadow_rift_save_v1';
+const WORLDS = [
+  {name:'Shadow Forest',bg:'forest',monsters:['Thorn Slime','Dark Wolf','Forest Imp'],boss:'Ancient Treant',img:'assets/monster-slime.svg',bossImg:'assets/boss-treant.svg'},
+  {name:'Ember Ruins',bg:'fire',monsters:['Ash Goblin','Lava Bat','Flame Hound'],boss:'Inferno Drake',img:'assets/monster-fire.svg',bossImg:'assets/boss-drake.svg'},
+  {name:'Crystal Abyss',bg:'crystal',monsters:['Crystal Wisp','Abyss Spider','Void Knight'],boss:'Abyss Monarch',img:'assets/monster-void.svg',bossImg:'assets/boss-void.svg'}
+];
+
+const SAVE_KEY = 'shadow_rift_save_v2';
 const rarityOrder = {R:1,SR:2,SSR:3,UR:4};
 let state = load();
+let battle = null;
 
-function freshState(){
-  return {gems:1800,gold:8000,stamina:35,stage:1,lastDaily:'',owned:{luna:{level:1,dupes:0},grom:{level:1,dupes:0},faye:{level:1,dupes:0}},team:['luna','grom','faye']};
-}
-function load(){try{return JSON.parse(localStorage.getItem(SAVE_KEY)) || freshState()}catch{return freshState()}}
+function freshState(){return {gems:2200,gold:9000,stamina:45,stage:1,selectedStage:1,lastDaily:'',owned:{luna:{level:1,dupes:0},grom:{level:1,dupes:0},faye:{level:1,dupes:0}},team:['luna','grom','faye']};}
+function load(){try{const old=JSON.parse(localStorage.getItem(SAVE_KEY)) || null;return old || freshState()}catch{return freshState()}}
 function save(){localStorage.setItem(SAVE_KEY,JSON.stringify(state));render();}
 function hero(id){return HEROES.find(h=>h.id===id)}
-function powerOf(id){const h=hero(id),o=state.owned[id];return Math.floor(h.base*(1+(o.level-1)*0.16)+(o.dupes*35));}
+function stageInfo(num=state.selectedStage){const world=WORLDS[Math.floor((num-1)/10)%WORLDS.length];const isBoss=num%5===0;const monster=isBoss?world.boss:world.monsters[(num-1)%world.monsters.length];return {world,isBoss,monster,num};}
+function powerOf(id){const h=hero(id),o=state.owned[id];return Math.floor(h.base*(1+(o.level-1)*0.18)+(o.dupes*42));}
 function totalPower(){return state.team.reduce((sum,id)=>sum+(state.owned[id]?powerOf(id):0),0)}
-function enemyPower(){return 560+state.stage*185;}
+function enemyPower(num=state.selectedStage){const s=stageInfo(num);return Math.floor(520+num*190+(s.isBoss?650+num*55:0));}
+function playerMaxHp(){return 1200+Math.floor(totalPower()*1.7)}
+function enemyMaxHp(){return 950+enemyPower()*2.05}
 function showPage(id){document.querySelectorAll('.page,.hero-screen').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');render();}
 function pickRarity(){const r=Math.random()*100;if(r<2)return'UR';if(r<10)return'SSR';if(r<37)return'SR';return'R';}
 function randomHeroByRarity(r){const pool=HEROES.filter(h=>h.rarity===r);return pool[Math.floor(Math.random()*pool.length)];}
 function pull(count){const cost=count===10?1350:150;if(state.gems<cost){toast('ما عندك جواهر كافية. العب مراحل أو خذ Daily Reward.');return;}state.gems-=cost;let results=[];for(let i=0;i<count;i++){const h=randomHeroByRarity(pickRarity());if(!state.owned[h.id]){state.owned[h.id]={level:1,dupes:0};if(state.team.length<5)state.team.push(h.id);}else{state.owned[h.id].dupes++;state.gold+=300;}results.push(h);}save();const box=document.getElementById('pullResults');box.innerHTML=results.map(cardHtml).join('');box.classList.remove('flash');void box.offsetWidth;box.classList.add('flash');}
 function upgrade(id){const o=state.owned[id];if(!o)return;const cost=500+o.level*230;if(state.gold<cost){toast('تحتاج Gold أكثر للتطوير.');return;}state.gold-=cost;o.level++;save();}
 function toggleTeam(id){if(!state.owned[id])return;if(state.team.includes(id)){if(state.team.length<=1){toast('لازم يبقى بطل واحد على الأقل.');return;}state.team=state.team.filter(x=>x!==id);}else{if(state.team.length>=5){toast('الفريق ممتلئ: 5 أبطال فقط.');return;}state.team.push(id);}save();}
-function battleStage(){showPage('battlePage');if(state.stamina<5){document.getElementById('battleLog').innerHTML='⚡ الطاقة غير كافية. انتظر أو استلم الهدية اليومية.';return;}state.stamina-=5;const p=totalPower();const e=enemyPower();const chance=Math.max(.12,Math.min(.9,.48+(p-e)/2200));const win=Math.random()<chance;let log=`Stage ${state.stage}<br>Your Power: ${p} vs Enemy: ${e}<br>`;if(win){const gem=80+state.stage*8,gold=900+state.stage*120;state.stage++;state.gems+=gem;state.gold+=gold;log+=`✅ Victory! حصلت على ${gem} 💎 و ${gold} 🪙<br>فتحت Stage ${state.stage}`;}else{const gold=260+state.stage*55;state.gold+=gold;log+=`❌ Defeat. حصلت على ${gold} 🪙 فقط.<br>طور الأبطال أو اسحب شخصيات أقوى.`;}save();const el=document.getElementById('battleLog');el.innerHTML=log;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function selectStage(n){if(n>state.stage){toast('لازم تفوز بالمراحل السابقة أولاً.');return;}state.selectedStage=n;save();}
+function startCurrentStage(){showPage('battlePage');startBattle(state.selectedStage);}
+function startBattle(num){if(state.stamina<5){document.getElementById('battleLog').innerHTML='⚡ الطاقة غير كافية. انتظر أو استلم الهدية اليومية.';return;}state.stamina-=5;const info=stageInfo(num);battle={stage:num,playerHp:playerMaxHp(),enemyHp:enemyMaxHp(),turn:1,done:false};save();document.getElementById('battleLog').innerHTML=`بدأت Stage ${num} - ${info.monster}<br>اختر مهارات الأبطال أو استخدم Auto Use Skills.`;renderBattle();}
+function useSkill(id){if(!battle||battle.done){toast('ابدأ مرحلة من الخريطة أولاً.');return;}const h=hero(id);const dmg=Math.floor(powerOf(id)*h.mult*(.85+Math.random()*.3));battle.enemyHp=Math.max(0,battle.enemyHp-dmg);let log=`${h.name} استخدم ${h.skill} وسبب ${dmg} ضرر.`;if(h.heal){const heal=Math.floor(playerMaxHp()*0.16);battle.playerHp=Math.min(playerMaxHp(),battle.playerHp+heal);log+=` وتعالج الفريق ${heal} HP.`;}if(battle.enemyHp<=0){finishBattle(true,log);return;}enemyTurn(log);}
+function useAutoSkills(){if(!battle||battle.done){startCurrentStage();return;}state.team.forEach(id=>{if(battle&&!battle.done)useSkill(id);});}
+function enemyTurn(log){const ep=enemyPower(battle.stage);const hit=Math.floor(ep*(.18+Math.random()*.12));battle.playerHp=Math.max(0,battle.playerHp-hit);log+=`<br>العدو رد عليك وسبب ${hit} ضرر.`;if(battle.playerHp<=0){finishBattle(false,log);return;}battle.turn++;document.getElementById('battleLog').innerHTML=log;renderBattle();}
+function finishBattle(win,log){battle.done=true;if(win){const info=stageInfo(battle.stage);const gem=(info.isBoss?280:90)+battle.stage*10;const gold=(info.isBoss?2800:950)+battle.stage*130;state.gems+=gem;state.gold+=gold;if(state.stage===battle.stage)state.stage++;state.selectedStage=state.stage;log+=`<br>✅ Victory! ${info.isBoss?'👑 Boss defeated!':''}<br>Rewards: ${gem} 💎 / ${gold} 🪙`;}
+else{const gold=260+battle.stage*55;state.gold+=gold;log+=`<br>❌ Defeat. حصلت على ${gold} 🪙. طور الأبطال أو غير الفريق.`;}
+save();document.getElementById('battleLog').innerHTML=log;renderBattle();}
 function claimDaily(){const today=new Date().toDateString();if(state.lastDaily===today){toast('استلمت مكافأة اليوم بالفعل.');return;}state.lastDaily=today;state.gems+=650;state.gold+=5000;state.stamina+=25;save();toast('🎁 Daily Reward: +650 Gems, +5000 Gold, +25 Stamina');}
-function cardHtml(h){const owned=state.owned[h.id];const level=owned?owned.level:1;const inTeam=state.team.includes(h.id);return `<div class="card"><span class="badge ${h.rarity}">${h.rarity}</span><img src="${h.img}" alt="${h.name}"><h3>${h.name}</h3><p>${h.role}</p><p>Lv.${level} • ${h.element}</p>${owned?`<button onclick="upgrade('${h.id}')">Upgrade ${500+level*230} 🪙</button><button onclick="toggleTeam('${h.id}')">${inTeam?'Remove':'Add'} Team</button>`:''}</div>`;}
-function render(){document.getElementById('gems').textContent=state.gems;document.getElementById('gold').textContent=state.gold;document.getElementById('stamina').textContent=state.stamina;document.getElementById('playerTitle').textContent=`Commander • Stage ${state.stage}`;document.getElementById('powerText').textContent=totalPower();document.getElementById('enemyText').textContent=enemyPower();document.getElementById('teamRow').innerHTML=[0,1,2,3,4].map(i=>{const id=state.team[i];return `<div class="team-slot">${id?`<img src="${hero(id).img}" alt="${hero(id).name}"><small>${hero(id).name}</small>`:'+'}</div>`}).join('');document.getElementById('heroGrid').innerHTML=HEROES.filter(h=>state.owned[h.id]).sort((a,b)=>rarityOrder[b.rarity]-rarityOrder[a.rarity]||powerOf(b.id)-powerOf(a.id)).map(cardHtml).join('');}
+function cardHtml(h){const owned=state.owned[h.id];const level=owned?owned.level:1;const inTeam=state.team.includes(h.id);return `<div class="card"><span class="badge ${h.rarity}">${h.rarity}</span><img src="${h.img}" alt="${h.name}"><h3>${h.name}</h3><p>${h.role}</p><p>Lv.${level} • PWR ${owned?powerOf(h.id):h.base}</p><div class="skill-text">✨ ${h.skill}<br><small>${h.skillDesc}</small></div>${owned?`<button onclick="upgrade('${h.id}')">Upgrade ${500+level*230} 🪙</button><button onclick="toggleTeam('${h.id}')">${inTeam?'Remove':'Add'} Team</button>`:''}</div>`;}
+function renderMap(){const map=document.getElementById('mapPanel');if(!map)return;const start=Math.max(1,Math.floor((state.stage-1)/10)*10+1);let html='';for(let i=start;i<start+10;i++){const info=stageInfo(i);const locked=i>state.stage;const active=i===state.selectedStage;html+=`<button class="stage-node ${info.isBoss?'boss':''} ${locked?'locked':''} ${active?'active-node':''}" onclick="selectStage(${i})"><b>${info.isBoss?'👑':'⚔️'} ${i}</b><span>${info.monster}</span><small>${info.world.name}</small></button>`;}map.innerHTML=html;}
+function renderBattle(){if(!document.getElementById('enemyName'))return;const info=stageInfo(battle?battle.stage:state.selectedStage);document.getElementById('battleTitle').textContent=`Stage ${info.num} • ${info.world.name}`;document.getElementById('battlefield').className=`battlefield ${info.world.bg}`;document.getElementById('enemyName').textContent=info.monster;document.getElementById('enemyImg').src=info.isBoss?info.world.bossImg:info.world.img;document.getElementById('bossTag').textContent=info.isBoss?'BOSS':'';document.getElementById('powerText').textContent=totalPower();document.getElementById('enemyText').textContent=enemyPower(info.num);document.getElementById('battleTeam').innerHTML=state.team.map(id=>`<img src="${hero(id).img}">`).join('');document.getElementById('skillsPanel').innerHTML=state.team.map(id=>{const h=hero(id);return `<button onclick="useSkill('${id}')"><b>${h.skill}</b><small>${h.name} • ${Math.floor(powerOf(id)*h.mult)} dmg</small></button>`}).join('');const ph=battle?Math.max(0,battle.playerHp/playerMaxHp()*100):100;const eh=battle?Math.max(0,battle.enemyHp/enemyMaxHp()*100):100;document.getElementById('playerHpBar').style.width=ph+'%';document.getElementById('enemyHpBar').style.width=eh+'%';}
+function render(){document.getElementById('gems').textContent=state.gems;document.getElementById('gold').textContent=state.gold;document.getElementById('stamina').textContent=state.stamina;document.getElementById('playerTitle').textContent=`Commander • Stage ${state.stage}`;document.getElementById('homePower').textContent=totalPower();document.getElementById('worldName').textContent=stageInfo(state.stage).world.name;document.getElementById('powerText')&&(document.getElementById('powerText').textContent=totalPower());document.getElementById('enemyText')&&(document.getElementById('enemyText').textContent=enemyPower());document.getElementById('teamRow').innerHTML=[0,1,2,3,4].map(i=>{const id=state.team[i];return `<div class="team-slot">${id?`<img src="${hero(id).img}" alt="${hero(id).name}"><small>${hero(id).name}</small>`:'+'}</div>`}).join('');document.getElementById('heroGrid').innerHTML=HEROES.filter(h=>state.owned[h.id]).sort((a,b)=>rarityOrder[b.rarity]-rarityOrder[a.rarity]||powerOf(b.id)-powerOf(a.id)).map(cardHtml).join('');renderMap();renderBattle();}
 function toast(msg){const old=document.querySelector('.toast');if(old)old.remove();const t=document.createElement('div');t.className='toast';t.textContent=msg;t.style.cssText='position:fixed;top:18px;left:50%;transform:translateX(-50%);width:min(92%,390px);background:#160c27;border:1px solid #b76cff;color:white;border-radius:16px;padding:12px;text-align:center;z-index:99;box-shadow:0 10px 30px #000';document.body.appendChild(t);setTimeout(()=>t.remove(),2600);} 
 render();
