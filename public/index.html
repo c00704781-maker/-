@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Shadow Rift - Gacha RPG</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="stars"></div>
+  <main class="phone">
+    <section class="hero-screen" id="home">
+      <div class="topbar">
+        <div><span>💎</span><b id="gems">0</b></div>
+        <div><span>🪙</span><b id="gold">0</b></div>
+        <div><span>⚡</span><b id="stamina">0</b></div>
+      </div>
+
+      <div class="logo-wrap">
+        <img src="assets/portal.svg" class="portal" alt="portal" />
+        <h1>SHADOW<br><span>RIFT</span></h1>
+        <p>GACHA RPG</p>
+      </div>
+
+      <div class="team-row" id="teamRow"></div>
+
+      <div class="panel compact">
+        <h2 id="playerTitle">Commander</h2>
+        <p id="storyText">اجمع أبطالك، طور قوتك، وافتح مراحل الظل.</p>
+        <button class="primary" onclick="battleStage()">⚔️ Battle Stage</button>
+        <button onclick="claimDaily()">🎁 Daily Reward</button>
+      </div>
+    </section>
+
+    <section class="page" id="gachaPage">
+      <h2>Summon Gate</h2>
+      <div class="summon-altar">
+        <img src="assets/crystal.svg" alt="crystal" />
+      </div>
+      <p class="rates">Rates: R 63% • SR 27% • SSR 8% • UR 2%</p>
+      <button class="primary" onclick="pull(1)">سحبة واحدة - 150 💎</button>
+      <button onclick="pull(10)">10 سحبات - 1350 💎</button>
+      <div id="pullResults" class="results"></div>
+    </section>
+
+    <section class="page" id="heroesPage">
+      <h2>Heroes</h2>
+      <div id="heroGrid" class="hero-grid"></div>
+    </section>
+
+    <section class="page" id="battlePage">
+      <h2>Campaign</h2>
+      <div class="arena">
+        <div>
+          <p>Your Power</p>
+          <b id="powerText">0</b>
+        </div>
+        <div class="versus">VS</div>
+        <div>
+          <p>Enemy</p>
+          <b id="enemyText">0</b>
+        </div>
+      </div>
+      <div id="battleLog" class="battle-log">اضغط Battle Stage من الصفحة الرئيسية لبدء القتال.</div>
+    </section>
+
+    <nav>
+      <button onclick="showPage('home')">🏰 Home</button>
+      <button onclick="showPage('gachaPage')">✨ Gacha</button>
+      <button onclick="showPage('heroesPage')">🛡️ Heroes</button>
+      <button onclick="showPage('battlePage')">⚔️ Battle</button>
+    </nav>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
